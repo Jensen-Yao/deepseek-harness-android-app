@@ -1,0 +1,4 @@
+#!/data/data/com.termux/files/usr/bin/sh
+# runit 服务：DSH 控制守护进程（随 Termux 自启、崩溃自动拉起）
+exec 2>&1
+exec /data/data/com.termux/files/usr/bin/node /data/data/com.termux/files/home/dsh/control/server.mjs

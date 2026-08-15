@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DeepSeek Harness Android App</title>
+<style>
+  :root {
+    --bg: #0b1020;
+    --panel: rgba(255,255,255,.04);
+    --line: rgba(255,255,255,.10);
+    --text: #e8ecf5;
+    --muted: #9aa5bf;
+    --accent: #4d6bfe;
+    --accent2: #7c3aed;
+    --green: #34c759;
+    --orange: #ff9500;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    background:
+      radial-gradient(1200px 500px at 80% -10%, rgba(77,107,254,.25), transparent 60%),
+      radial-gradient(900px 400px at 10% 110%, rgba(124,58,237,.18), transparent 60%),
+      var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    letter-spacing: .01em;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 72px 24px 96px; }
+  .hero { text-align: center; margin-bottom: 64px; }
+  .badge {
+    display: inline-block; padding: 6px 14px; border-radius: 999px;
+    border: 1px solid var(--line); color: var(--muted); font-size: 13px;
+    background: var(--panel); margin: 0 4px 8px;
+  }
+  h1 {
+    font-size: clamp(34px, 6vw, 56px); line-height: 1.15;
+    letter-spacing: -0.03em; margin: 18px 0 14px;
+    background: linear-gradient(120deg, #fff 20%, #9db4ff 70%, #b79dff);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .sub { color: var(--muted); font-size: 18px; max-width: 640px; margin: 0 auto; line-height: 1.7; }
+  .cta { margin-top: 34px; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: 14px 28px; border-radius: 14px; font-weight: 600;
+    text-decoration: none; transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; box-shadow: 0 10px 30px rgba(77,107,254,.35); }
+  .btn-ghost { border: 1px solid var(--line); color: var(--text); background: var(--panel); }
+  section { margin: 56px 0; }
+  h2 { font-size: 26px; letter-spacing: -0.02em; margin-bottom: 8px; }
+  .lead { color: var(--muted); font-size: 15px; margin-bottom: 24px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
+    padding: 22px; transition: transform .2s ease, border-color .2s ease;
+  }
+  .card:hover { transform: translateY(-3px); border-color: rgba(77,107,254,.4); }
+  .card .icon { font-size: 26px; margin-bottom: 10px; }
+  .card h3 { font-size: 17px; margin-bottom: 8px; }
+  .card p { color: var(--muted); font-size: 14px; line-height: 1.65; }
+  .flow { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: center; margin-top: 26px; }
+  .step {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+    padding: 14px 20px; font-size: 15px;
+  }
+  .step b { color: var(--accent); margin-right: 6px; }
+  .arrow { color: var(--muted); }
+  .pill { display: inline-block; padding: 4px 12px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); color: var(--muted); font-size: 12px; margin: 3px; }
+  pre {
+    background: rgba(0,0,0,.35); border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px; overflow-x: auto; font-size: 13px; color: #cdd6f4;
+    font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 500; }
+  td:first-child { white-space: nowrap; color: #9db4ff; }
+  footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 80px; }
+  a { color: var(--accent); }
+  @media (max-width: 640px) { .wrap { padding: 48px 18px 64px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div>
+      <span class="badge">🤖 DeepSeek Harness</span>
+      <span class="badge">📱 Android · Termux</span>
+      <span class="badge">⚡ 一键部署</span>
+    </div>
+    <h1>把 DeepSeek Harness<br>装进你的手机</h1>
+    <p class="sub">原生安卓控制端：Termux 引导安装、按机型匹配下载、一键部署、实时日志、内置浏览器与存储管理。<b>全程点按完成，无需命令行。</b></p>
+    <div class="cta">
+      <a class="btn btn-primary" href="https://github.com/Jensen-Yao/deepseek-harness-android-app/releases">⬇ 下载 APK</a>
+      <a class="btn btn-ghost" href="https://github.com/Jensen-Yao/deepseek-harness-android-app">GitHub 仓库</a>
+    </div>
+  </div>
+
+  <section>
+    <h2>🚀 三步跑起来</h2>
+    <p class="lead">只需把 APK 传到手机装一次，之后全部在 App 内完成。</p>
+    <div class="flow">
+      <div class="step"><b>1</b>App 内下载并安装 Termux（按机型匹配）</div>
+      <span class="arrow">→</span>
+      <div class="step"><b>2</b>一键部署 DeepSeek Harness（自动选最快源）</div>
+      <span class="arrow">→</span>
+      <div class="step"><b>3</b>打开 Harness，填入 API Key</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>✨ 特性</h2>
+    <div class="grid">
+      <div class="card"><div class="icon">🧭</div><h3>Termux 引导</h3><p>识别机型与架构，App 内下载匹配安装包并调起系统安装器。</p></div>
+      <div class="card"><div class="icon">🚀</div><h3>一键部署</h3><p>自动测速选源 → 装工具链 → 编译原生模块 → 启动服务，全程实时日志。</p></div>
+      <div class="card"><div class="icon">📟</div><h3>三通道日志</h3><p>脚本心跳上报 + 早期进度服务 + 控制守护进程，日志从第 0 秒可见。</p></div>
+      <div class="card"><div class="icon">🌐</div><h3>内置浏览器</h3><p>WebView 直接使用 Harness；外部打开可选任意已装浏览器（默认 Via）。</p></div>
+      <div class="card"><div class="icon">🎛</div><h3>服务控制</h3><p>启动/停止/重启/状态/日志，点按完成，不碰命令行。</p></div>
+      <div class="card"><div class="icon">📁</div><h3>存储管理</h3><p>浏览/编辑会话、附件、技能、MCP 配置；统一数据根一键迁移共享存储。</p></div>
+      <div class="card"><div class="icon">🔋</div><h3>防冻结引导</h3><p>按机型提示电池优化设置，服务不再被系统冻结。</p></div>
+      <div class="card"><div class="icon">🎨</div><h3>Apple 设计</h3><p>iOS 色板、弹簧动画、触觉反馈——细节到按钮的按下手感。</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>📁 存储位置一览</h2>
+    <p class="lead">数据根 <code>~/.dsh</code>（可整体迁移到 <code>/sdcard/dsh-data</code>）。</p>
+    <table>
+      <tr><th>数据</th><th>路径</th></tr>
+      <tr><td>凭证</td><td><code>~/.dsh/.credentials.yaml</code></td></tr>
+      <tr><td>设置</td><td><code>~/.dsh/settings.yaml</code></td></tr>
+      <tr><td>会话</td><td><code>~/.dsh/sessions/&lt;项目&gt;/&lt;会话&gt;/session.jsonl</code></td></tr>
+      <tr><td>附件</td><td><code>~/.dsh/attachments/v1/objects/&lt;sha256…&gt;</code></td></tr>
+      <tr><td>技能</td><td><code>~/.dsh/skills</code> · <code>~/.agents/skills</code> · 项目级 <code>.dsh/skills</code></td></tr>
+      <tr><td>MCP 配置</td><td><code>~/.dsh/profiles/</code> 配置档案（cordis.patch.yml）</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>🏷 主题标签</h2>
+    <p class="lead">本仓库与 DeepSeek Harness 生态的关联标签：</p>
+    <div>
+      <span class="pill">deepseek-harness</span>
+      <span class="pill">dsh</span>
+      <span class="pill">dsh-plugin</span>
+      <span class="pill">deepseek</span>
+      <span class="pill">android</span>
+      <span class="pill">termux</span>
+      <span class="pill">android-app</span>
+      <span class="pill">agent-harness</span>
+      <span class="pill">cli-agent</span>
+      <span class="pill">mobile-ai</span>
+    </div>
+  </section>
+
+  <footer>
+    <p>基于 <a href="https://github.com/deepseek-ai/deepseek-harness">DeepSeek Harness</a> · 参考 <a href="https://github.com/FunnelCakes/deepseek-harness-android">FunnelCakes/deepseek-harness-android</a> · MIT License</p>
+  </footer>
+</div>
+</body>
+</html>

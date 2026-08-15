@@ -1,0 +1,121 @@
+﻿# 生成 DeployAssets.java：嵌入守护进程(base64) + 一键部署引导脚本
+$ErrorActionPreference = 'Stop'
+$srcDir = 'F:\dh talk\dsh-control'
+$outFile = 'F:\dh talk\dsh-control\app2\src\com\dshharness\app\DeployAssets.java'
+New-Item -ItemType Directory -Force -Path (Split-Path $outFile) | Out-Null
+
+$serverB64 = [Convert]::ToBase64String([IO.File]::ReadAllBytes("$srcDir\server.mjs"))
+$startB64  = [Convert]::ToBase64String([IO.File]::ReadAllBytes("$srcDir\start-daemon.sh"))
+$runitB64  = [Convert]::ToBase64String([IO.File]::ReadAllBytes("$srcDir\runit-run"))
+
+$bootstrap = @'
+set -e
+export PATH=/data/data/com.termux/files/usr/bin:$PATH
+export HOME=/data/data/com.termux/files/home
+mkdir -p $HOME/dsh/storage
+# 终端可见日志：先起后台 tail 回显，再把脚本自身输出重定向进日志（POSIX 兼容，dash/bash 均可）
+: > $HOME/dsh/storage/deploy.log
+tail -n +1 -f $HOME/dsh/storage/deploy.log &
+TAIL_PID=$!
+# 心跳：把最新日志推给 App 的本地服务（8045），App 进度卡从第 0 秒可见日志
+( while true; do tail -n 40 $HOME/dsh/storage/deploy.log 2>/dev/null | curl -s --max-time 3 --data-binary @- http://127.0.0.1:8045/log >/dev/null 2>&1; sleep 2; done ) &
+HEART_PID=$!
+trap 'kill $TAIL_PID $HEART_PID 2>/dev/null' EXIT
+exec >> $HOME/dsh/storage/deploy.log 2>&1
+echo "[deploy] === 开始部署 DeepSeek Harness $(date +%F_%T) ==="
+echo "[deploy] 设备: $(getprop ro.product.manufacturer) $(getprop ro.product.model) / Android $(getprop ro.build.version.release) / $(uname -m)"
+echo '[deploy] 0/7 启动早期进度服务（日志从此刻实时可见）'
+mkdir -p $HOME/dsh/progress
+ln -sf $HOME/dsh/storage/deploy.log $HOME/dsh/progress/deploy.log
+nohup busybox httpd -f -p 8024 -h $HOME/dsh/progress >/dev/null 2>&1 || true
+echo '[deploy] 1/8 自动测速选择最快软件源'
+command -v curl >/dev/null 2>&1 || pkg install -y curl >/dev/null 2>&1 || true
+BEST=99
+FAST=
+for pair in packages-cf.termux.dev/apt/termux-main mirrors.bfsu.edu.cn/termux/apt/termux-main mirrors.tuna.tsinghua.edu.cn/termux/apt/termux-main mirrors.ustc.edu.cn/termux/apt/termux-main mirrors.aliyun.com/termux/termux-main mirrors.nju.edu.cn/termux/apt/termux-main mirrors.pku.edu.cn/termux/apt/termux-main; do
+  host=${pair%%/*}
+  path=${pair#*/}
+  T=$(curl -o /dev/null -s -w '%{time_total}' --max-time 4 "https://$host/$path/dists/stable/InRelease" 2>/dev/null || true)
+  [ -z "$T" ] && { echo "[deploy] 测速 $host: 不可达"; continue; }
+  echo "[deploy] 测速 $host: ${T}s"
+  OK=$(awk -v t="$T" -v b="$BEST" 'BEGIN{print (t+0 < b+0) ? 1 : 0}')
+  if [ "$OK" = "1" ]; then BEST="$T"; FAST="$host/$path"; fi
+done
+if [ -n "$FAST" ]; then
+  host=${FAST%%/*}
+  path=${FAST#*/}
+  echo "deb https://$host/$path stable main" > $PREFIX/etc/apt/sources.list
+  echo "[deploy] 已选择最快源: https://$host (${BEST}s)"
+else
+  echo '[deploy] 全部镜像不可达，保留默认源'
+fi
+echo '[deploy] 2/8 更新包索引'
+pkg update -y || true
+echo '[deploy] 3/8 升级系统包'
+pkg upgrade -y -o Dpkg::Options::=--force-confold || true
+echo '[deploy] 4/8 安装构建依赖 (约 2~5 分钟)'
+pkg install -y git curl openssh cmake clang make binutils pkg-config python nodejs termux-services libandroid-spawn
+echo '[deploy] 5/8 启动控制守护进程 (提供实时进度)'
+mkdir -p $HOME/dsh/control
+echo '__SERVER_B64__' | base64 -d > $HOME/dsh/control/server.mjs
+echo '__START_B64__' | base64 -d > $HOME/dsh/control/start-daemon.sh
+chmod +x $HOME/dsh/control/start-daemon.sh
+sh $HOME/dsh/control/start-daemon.sh || true
+echo '[deploy] 6/8 克隆并安装 DeepSeek Harness (约 5~15 分钟, 请勿中断)'
+cd $HOME
+rm -rf deepseek-harness-android
+git clone --depth 1 https://github.com/FunnelCakes/deepseek-harness-android.git || git clone --depth 1 https://gitclone.com/github.com/FunnelCakes/deepseek-harness-android.git || git clone --depth 1 https://gh-proxy.com/https://github.com/FunnelCakes/deepseek-harness-android.git
+cd deepseek-harness-android
+bash setup.sh
+echo '[deploy] 7/8 配置自启'
+mkdir -p $PREFIX/var/service/dsh-control
+echo '__RUNIT_B64__' | base64 -d > $PREFIX/var/service/dsh-control/run
+chmod +x $PREFIX/var/service/dsh-control/run
+echo '[deploy] 8/8 恢复远程通道并启动服务'
+mkdir -p $HOME/.ssh
+chmod 700 $HOME/.ssh
+echo '__MY_PUBKEY__' >> $HOME/.ssh/authorized_keys
+sort -u $HOME/.ssh/authorized_keys -o $HOME/.ssh/authorized_keys
+chmod 600 $HOME/.ssh/authorized_keys
+nohup sshd >/dev/null 2>&1 || true
+sh $HOME/dsh/control/start-daemon.sh || true
+bash $HOME/dsh/start_dsh.sh || true
+echo '[deploy] === 部署完成 ==='
+'@
+
+$myPubKey = 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJy5JZM0JyNOfL+CYSpS32SeNDUafGHDH9sl9XA78/rC dsh-pc-admin'
+$bootstrap = $bootstrap.Replace('__SERVER_B64__', $serverB64).Replace('__START_B64__', $startB64).Replace('__RUNIT_B64__', $runitB64).Replace('__MY_PUBKEY__', $myPubKey)
+
+function ToJava([string]$s) {
+    $sb = New-Object System.Text.StringBuilder
+    foreach ($ch in $s.ToCharArray()) {
+        switch ($ch) {
+            '\' { [void]$sb.Append('\\') }
+            '"' { [void]$sb.Append('\"') }
+            "`n" { [void]$sb.Append('\n') }
+            "`t" { [void]$sb.Append('\t') }
+            "`r" { }
+            default { [void]$sb.Append($ch) }
+        }
+    }
+    return $sb.ToString()
+}
+
+$java = @"
+package com.dshharness.app;
+
+// Auto-generated by gen-assets.ps1 - deploy bootstrap + embedded daemon assets. Do not edit by hand.
+public final class DeployAssets {
+
+    public static final String SERVER_B64 = "$serverB64";
+
+    public static final String START_B64 = "$startB64";
+
+    public static final String RUNIT_B64 = "$runitB64";
+
+    public static final String BOOTSTRAP = "$(ToJava $bootstrap)";
+}
+"@
+
+[IO.File]::WriteAllText($outFile, $java, (New-Object System.Text.UTF8Encoding($false)))
+Write-Output "generated: $outFile ($((Get-Item $outFile).Length) bytes)"

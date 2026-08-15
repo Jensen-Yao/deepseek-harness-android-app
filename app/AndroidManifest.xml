@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.dshharness.app"
+    android:versionCode="2"
+    android:versionName="1.1">
+
+    <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="36" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.termux.permission.RUN_COMMAND" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Android 11+ 包可见性 -->
+    <queries>
+        <package android:name="com.termux" />
+        <package android:name="mark.via" />
+        <package android:name="com.android.chrome" />
+        <package android:name="com.microsoft.emmx" />
+        <package android:name="org.mozilla.firefox" />
+        <package android:name="com.oplus.browser" />
+        <package android:name="com.huawei.browser" />
+        <package android:name="com.android.browser" />
+        <package android:name="com.quark.browser" />
+        <package android:name="com.UCMobile" />
+        <package android:name="com.tencent.mtt" />
+        <package android:name="com.baidu.browser" />
+    </queries>
+
+    <application
+        android:label="DeepSeek Harness"
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true"
+        android:theme="@android:style/Theme.Material.Light.NoActionBar">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".WebActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Material.Light.NoActionBar">
+        </activity>
+
+        <!-- 提供下载好的 Termux APK 给系统安装器 -->
+        <provider
+            android:name=".ApkProvider"
+            android:authorities="com.dshharness.app.apk"
+            android:exported="false"
+            android:grantUriPermissions="true">
+        </provider>
+
+        <!-- 部署脚本服务（前台服务，避免后台冻结） -->
+        <service
+            android:name=".DeployServerService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync">
+        </service>
+    </application>
+</manifest>

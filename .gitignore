@@ -1,0 +1,15 @@
+# 构建产物
+app/build/
+app/build2/
+app/*.keystore
+app/res.zip
+
+# 系统文件
+.DS_Store
+Thumbs.db
+*.log
+
+# IDE
+.idea/
+*.iml
+.vscode/
