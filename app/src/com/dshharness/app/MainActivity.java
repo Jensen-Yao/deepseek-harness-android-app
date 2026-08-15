@@ -684,21 +684,45 @@ public class MainActivity extends Activity {
 
     // ================================================================ Termux 下载/安装向导
 
-    /** 依据 Termux 安装/部署状态渲染操作区：未安装=下载+安装向导；已部署=恢复按钮 */
+    /** 依据 Termux 安装/部署状态渲染操作区：未安装=下载+安装向导；已安装=启动/关闭按钮 */
     private void renderTermuxAction() {
         if (termuxActionArea == null) return;
         termuxActionArea.removeAllViews();
         if (termuxInstalled()) {
-            // 「恢复服务」只对已部署设备有意义；未部署设备引导走粘贴部署卡
-            if (getSharedPreferences("dsh", MODE_PRIVATE).getBoolean("deployed", false)) {
-                TextView recoverBtn = secondaryButton("启动 Termux 并恢复服务");
-                recoverBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override public void onClick(View v) { recoverTermuxEnv(); }
-                });
-                termuxActionArea.addView(recoverBtn);
-            } else {
+            LinearLayout row = new LinearLayout(this);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            boolean deployed = getSharedPreferences("dsh", MODE_PRIVATE)
+                    .getBoolean("deployed", false);
+            TextView startBtn = tintButton(deployed ? "启动 Termux 并恢复服务" : "启动 Termux",
+                    Design.GREEN, new View.OnClickListener() {
+                        @Override public void onClick(View v) {
+                            if (getSharedPreferences("dsh", MODE_PRIVATE)
+                                    .getBoolean("deployed", false)) {
+                                recoverTermuxEnv();
+                            } else {
+                                startTermuxOnly();
+                            }
+                        }
+                    });
+            row.addView(startBtn, new LinearLayout.LayoutParams(
+                    0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.4f));
+            TextView closeBtn = tintButton("关闭 Termux", Design.RED,
+                    new View.OnClickListener() {
+                        @Override public void onClick(View v) { closeTermux(); }
+                    });
+            LinearLayout.LayoutParams cbLp = new LinearLayout.LayoutParams(
+                    0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+            cbLp.setMargins(Design.dp(this, 6), 0, 0, 0);
+            closeBtn.setLayoutParams(cbLp);
+            row.addView(closeBtn);
+            termuxActionArea.addView(row);
+            if (!deployed) {
                 TextView hint = Design.footnote(this,
                         "首次部署请使用下方「粘贴部署」卡，或先尝试「一键部署」按钮。");
+                LinearLayout.LayoutParams hLp = new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                hLp.setMargins(0, Design.dp(this, 6), 0, 0);
+                hint.setLayoutParams(hLp);
                 termuxActionArea.addView(hint);
             }
             return;
@@ -1202,6 +1226,57 @@ public class MainActivity extends Activity {
     /** 万能粘贴部署命令：App 本地服务 8045 提供脚本，Termux 内 curl | sh 一键部署（带超时防挂死） */
     private static final String PASTE_CMD =
             "curl -fsSL --connect-timeout 5 --max-time 60 http://127.0.0.1:8045/deploy.sh | sh";
+
+    /** 关闭 Termux：从内部按进程名杀掉主进程（连同 dsh 服务、守护进程、sshd 一并停止） */
+    private static final String CLOSE_TERMUX_SCRIPT =
+            "for p in /proc/[0-9]*; do n=$(cat $p/comm 2>/dev/null); "
+            + "if [ \"$n\" = \"com.termux\" ]; then kill -9 ${p##*/}; fi; done";
+
+    /** 仅启动 Termux App（不做服务恢复） */
+    private void startTermuxOnly() {
+        try {
+            Intent launch = getPackageManager().getLaunchIntentForPackage(TERMUX_PKG);
+            if (launch != null) {
+                launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(launch);
+                toast("已启动 Termux");
+            } else {
+                toast("无法启动 Termux");
+            }
+        } catch (Exception e) {
+            toast("无法启动 Termux");
+        }
+    }
+
+    /** 关闭 Termux：确认后从 Termux 内部杀掉主进程 */
+    private void closeTermux() {
+        showSheet("关闭 Termux？",
+                "将完全停止 Termux 及其中的一切：dsh 服务、控制守护进程、SSH 通道都会随之停止。\n\n"
+                        + "之后可随时点「启动 Termux 并恢复服务」重新拉起。\n"
+                        + "（部分机型若拦截外部命令，请手动关闭 Termux）",
+                new String[]{"取消", "确认关闭"},
+                new Runnable[]{
+                        new Runnable() { @Override public void run() { dismissSheet(); } },
+                        new Runnable() {
+                            @Override public void run() {
+                                try {
+                                    sendRunCommand(new String[]{"-c", CLOSE_TERMUX_SCRIPT});
+                                    toast("已请求关闭 Termux");
+                                    Design.haptic(depIdleCard, HapticFeedbackConstants.CONFIRM);
+                                } catch (Exception e) {
+                                    toast("关闭请求失败：" + e.getMessage());
+                                }
+                                ui.postDelayed(new Runnable() {
+                                    @Override public void run() {
+                                        refreshDaemonRow();
+                                        refreshControl();
+                                        refreshEnv();
+                                        refreshDeployPage();
+                                    }
+                                }, 3000);
+                            }
+                        }});
+    }
 
     /** 部署超时兜底引导：优先粘贴命令方式（无需任何权限），其次开启外部权限后重试 */
     private void showAllowExternalAppsGuide() {
