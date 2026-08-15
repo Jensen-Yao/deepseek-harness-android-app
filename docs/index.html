@@ -13,8 +13,6 @@
     --muted: #9aa5bf;
     --accent: #4d6bfe;
     --accent2: #7c3aed;
-    --green: #34c759;
-    --orange: #ff9500;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -27,6 +25,14 @@
     min-height: 100vh;
     letter-spacing: .01em;
   }
+  .langbar { position: fixed; top: 18px; right: 20px; z-index: 50; display: flex; gap: 8px; }
+  .langbtn {
+    padding: 7px 16px; border-radius: 999px; cursor: pointer; font-size: 13px; font-weight: 600;
+    border: 1px solid var(--line); background: var(--panel); color: var(--muted); transition: all .18s ease;
+  }
+  .langbtn.active { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border-color: transparent; }
+  .lang { display: none; }
+  .lang.active { display: block; }
   .wrap { max-width: 1080px; margin: 0 auto; padding: 72px 24px 96px; }
   .hero { text-align: center; margin-bottom: 64px; }
   .badge {
@@ -80,10 +86,18 @@
   td:first-child { white-space: nowrap; color: #9db4ff; }
   footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 80px; }
   a { color: var(--accent); }
-  @media (max-width: 640px) { .wrap { padding: 48px 18px 64px; } }
+  @media (max-width: 640px) { .wrap { padding: 56px 18px 64px; } .langbar { top: 12px; right: 12px; } }
 </style>
 </head>
 <body>
+
+<div class="langbar">
+  <button class="langbtn active" onclick="switchLang('cn')">中文</button>
+  <button class="langbtn" onclick="switchLang('en')">EN</button>
+</div>
+
+<!-- ================= 中文 ================= -->
+<div id="lang-cn" class="lang active">
 <div class="wrap">
 
   <div class="hero">
@@ -120,6 +134,7 @@
       <div class="card"><div class="icon">📟</div><h3>三通道日志</h3><p>脚本心跳上报 + 早期进度服务 + 控制守护进程，日志从第 0 秒可见。</p></div>
       <div class="card"><div class="icon">🌐</div><h3>内置浏览器</h3><p>WebView 直接使用 Harness；外部打开可选任意已装浏览器（默认 Via）。</p></div>
       <div class="card"><div class="icon">🎛</div><h3>服务控制</h3><p>启动/停止/重启/状态/日志，点按完成，不碰命令行。</p></div>
+      <div class="card"><div class="icon">🔛</div><h3>Termux 开关</h3><p>从 App 内直接启动或关闭 Termux，无需手动切换。</p></div>
       <div class="card"><div class="icon">📁</div><h3>存储管理</h3><p>浏览/编辑会话、附件、技能、MCP 配置；统一数据根一键迁移共享存储。</p></div>
       <div class="card"><div class="icon">🔋</div><h3>防冻结引导</h3><p>按机型提示电池优化设置，服务不再被系统冻结。</p></div>
       <div class="card"><div class="icon">🎨</div><h3>Apple 设计</h3><p>iOS 色板、弹簧动画、触觉反馈——细节到按钮的按下手感。</p></div>
@@ -142,7 +157,6 @@
 
   <section>
     <h2>🏷 主题标签</h2>
-    <p class="lead">本仓库与 DeepSeek Harness 生态的关联标签：</p>
     <div>
       <span class="pill">deepseek-harness</span>
       <span class="pill">dsh</span>
@@ -161,5 +175,98 @@
     <p>基于 <a href="https://github.com/deepseek-ai/deepseek-harness">DeepSeek Harness</a> · 参考 <a href="https://github.com/FunnelCakes/deepseek-harness-android">FunnelCakes/deepseek-harness-android</a> · MIT License</p>
   </footer>
 </div>
+</div>
+
+<!-- ================= English ================= -->
+<div id="lang-en" class="lang">
+<div class="wrap">
+
+  <div class="hero">
+    <div>
+      <span class="badge">🤖 DeepSeek Harness</span>
+      <span class="badge">📱 Android · Termux</span>
+      <span class="badge">⚡ One-click deploy</span>
+    </div>
+    <h1>Put DeepSeek Harness<br>in your pocket</h1>
+    <p class="sub">A native Android control app: Termux setup wizard, model-matched downloads, one-click deploy, live logs, built-in browser and storage manager. <b>Tap-only — no command line.</b></p>
+    <div class="cta">
+      <a class="btn btn-primary" href="https://github.com/Jensen-Yao/deepseek-harness-android-app/releases">⬇ Download APK</a>
+      <a class="btn btn-ghost" href="https://github.com/Jensen-Yao/deepseek-harness-android-app">GitHub Repo</a>
+    </div>
+  </div>
+
+  <section>
+    <h2>🚀 Three steps to run</h2>
+    <p class="lead">Transfer the APK to your phone once; everything else happens in the app.</p>
+    <div class="flow">
+      <div class="step"><b>1</b>Download &amp; install Termux in-app (model-matched)</div>
+      <span class="arrow">→</span>
+      <div class="step"><b>2</b>One-click deploy DeepSeek Harness (fastest mirror auto-picked)</div>
+      <span class="arrow">→</span>
+      <div class="step"><b>3</b>Open Harness and enter your API Key</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>✨ Features</h2>
+    <div class="grid">
+      <div class="card"><div class="icon">🧭</div><h3>Termux wizard</h3><p>Detects model &amp; ABI, downloads the matching APK in-app and launches the system installer.</p></div>
+      <div class="card"><div class="icon">🚀</div><h3>One-click deploy</h3><p>Auto speed-tests mirrors → installs toolchain → compiles native modules → starts the service, with live logs.</p></div>
+      <div class="card"><div class="icon">📟</div><h3>Triple-channel logs</h3><p>Heartbeat push + early progress server + control daemon — logs visible from second zero.</p></div>
+      <div class="card"><div class="icon">🌐</div><h3>Built-in browser</h3><p>Use Harness in a WebView; open externally in any installed browser (Via by default).</p></div>
+      <div class="card"><div class="icon">🎛</div><h3>Service control</h3><p>Start / stop / restart / status / logs — tap-only.</p></div>
+      <div class="card"><div class="icon">🔛</div><h3>Termux on/off</h3><p>Start or shut down Termux right from the app.</p></div>
+      <div class="card"><div class="icon">📁</div><h3>Storage manager</h3><p>Browse/edit sessions, attachments, skills, MCP config; one unified data root for shared storage.</p></div>
+      <div class="card"><div class="icon">🔋</div><h3>Anti-freeze guide</h3><p>Model-aware battery-optimization steps so the service never gets frozen.</p></div>
+      <div class="card"><div class="icon">🎨</div><h3>Apple design</h3><p>iOS palette, spring animations, haptics — down to button press feel.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>📁 Storage locations</h2>
+    <p class="lead">One data root <code>~/.dsh</code> (migratable to <code>/sdcard/dsh-data</code>).</p>
+    <table>
+      <tr><th>Data</th><th>Path</th></tr>
+      <tr><td>Credentials</td><td><code>~/.dsh/.credentials.yaml</code></td></tr>
+      <tr><td>Settings</td><td><code>~/.dsh/settings.yaml</code></td></tr>
+      <tr><td>Sessions</td><td><code>~/.dsh/sessions/&lt;project&gt;/&lt;session&gt;/session.jsonl</code></td></tr>
+      <tr><td>Attachments</td><td><code>~/.dsh/attachments/v1/objects/&lt;sha256…&gt;</code></td></tr>
+      <tr><td>Skills</td><td><code>~/.dsh/skills</code> · <code>~/.agents/skills</code> · project-level <code>.dsh/skills</code></td></tr>
+      <tr><td>MCP config</td><td><code>~/.dsh/profiles/</code> profile patches (cordis.patch.yml)</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>🏷 Topics</h2>
+    <div>
+      <span class="pill">deepseek-harness</span>
+      <span class="pill">dsh</span>
+      <span class="pill">dsh-plugin</span>
+      <span class="pill">deepseek</span>
+      <span class="pill">android</span>
+      <span class="pill">termux</span>
+      <span class="pill">android-app</span>
+      <span class="pill">agent-harness</span>
+      <span class="pill">cli-agent</span>
+      <span class="pill">mobile-ai</span>
+    </div>
+  </section>
+
+  <footer>
+    <p>Based on <a href="https://github.com/deepseek-ai/deepseek-harness">DeepSeek Harness</a> · Reference <a href="https://github.com/FunnelCakes/deepseek-harness-android">FunnelCakes/deepseek-harness-android</a> · MIT License</p>
+  </footer>
+</div>
+</div>
+
+<script>
+function switchLang(lang) {
+  document.getElementById('lang-cn').classList.toggle('active', lang === 'cn');
+  document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+  var btns = document.querySelectorAll('.langbtn');
+  btns[0].classList.toggle('active', lang === 'cn');
+  btns[1].classList.toggle('active', lang === 'en');
+  document.documentElement.lang = lang === 'cn' ? 'zh-CN' : 'en';
+}
+</script>
 </body>
 </html>
