@@ -163,6 +163,26 @@ docs/       项目主页（GitHub Pages）/ project site (GitHub Pages)
 
 ## ❓ FAQ
 
+<details open>
+<summary><b>🤔 这不是给电脑用的吗？手机也能跑？/ Isn't this PC-only? Can a phone really run it?</b></summary>
+
+**本质**：DeepSeek Harness 是 Node.js agent 编排框架 + Web UI，对硬件的真实要求只有「Unix 环境 + Node 运行时」。手机（ARM SoC + Linux 内核）本身就是一台计算机，Termux 补齐环境；官方讨论区早有 Android/Termux 部署案例（[Discussion #136](https://github.com/deepseek-ai/deepseek-harness/discussions/136)），华为 Mate 60 实机已验证。
+
+**Essence**: DeepSeek Harness is a Node.js agent-orchestration framework + Web UI. Its only real requirements are a Unix environment and a Node runtime. A phone (ARM SoC + Linux kernel) *is* a computer; Termux completes the environment. Community deployments on Android/Termux exist (see Discussion #136) and are verified on a Huawei Mate 60.
+
+**手机部署的四个独特价值 / Four values unique to phone deployment**：
+
+| 价值 Value | 说明 Description |
+|---|---|
+| 📱 随身 AI 工作站 / Pocket AI workstation | 会话、技能、文件全在本机，出门掏出手机接着用，无需同步或服务器 · Sessions, skills and files stay on-device — pick up anywhere, no sync or servers |
+| ⚡ 真实操作手机 / Really operates the phone | agent 在手机上真执行 bash：批量处理照片、整理文件、跑脚本、装工具——把手机变成「可被 AI 编程的设备」· The agent really executes bash on the phone: batch-rename photos, organize files, run scripts, install tools — turning the phone into an AI-programmable device |
+| 🔒 数据不出设备 / Data stays on-device | API Key 仅存本机（0600），不上传任何云 · API key stored locally only (0600), nothing uploaded to any cloud |
+| 💰 零服务器成本 / Zero server cost | 只花 API token 钱；手机常开在线，任务随时派 · Only token costs; the phone is always online, ready for tasks |
+
+**诚实的边界 / Honest boundaries**：手机上跑的是 **agent 编排**，模型推理走云端 API（手机无 GPU，不适合本地跑大模型）；重型编译速度不如 PC；部分国产 ROM 会冻结后台——App 已内置按机型的防冻结引导。· The phone runs the **agent orchestration**; model inference goes through the cloud API (no GPU on phones — not for running large models locally). Heavy compiles are slower than on a PC; some Chinese ROMs freeze background apps — the app includes model-specific anti-freeze guidance.
+
+</details>
+
 - **自动部署被拦截？ Auto-deploy blocked?** 使用 App 弹出的「粘贴部署」万能通道（无需任何权限）。Use the "paste deploy" universal channel that the app pops up (no permissions needed).
 - **切后台服务被冻结？ Frozen in background?** 按 App 内「电池优化（防冻结）」卡片完成机型对应设置。Follow the in-app "Battery optimization (anti-freeze)" card.
 - **App 不显示日志？ No logs in app?** 已三通道冗余（心跳上报/早期服务/守护进程）；终端侧也可 `tail -f ~/dsh/storage/deploy.log`。Triple-channel redundancy already; in the terminal you can also `tail -f ~/dsh/storage/deploy.log`.
