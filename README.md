@@ -10,9 +10,21 @@
 [![DeepSeek Harness](https://img.shields.io/badge/DeepSeek%20Harness-0.1.0--rc.6-4D6BFE.svg)](https://github.com/deepseek-ai/deepseek-harness)
 [![Termux](https://img.shields.io/badge/Termux-F--Droid-orange.svg)](https://f-droid.org/packages/com.termux/)
 
-[中文](#-特性-中文) · [English](#-features-english) · [存储位置 / Storage](#-存储位置--storage-locations)
+[中文](#-特性-中文) · [English](#-features-english) · [截图 / Screenshots](#-截图--screenshots) · [存储位置 / Storage](#-存储位置--storage-locations)
 
 </div>
+
+---
+
+## 📸 截图 / Screenshots
+
+| 服务控制 Control | 部署向导 Deploy wizard | 部署进度 Deploy progress |
+|---|---|---|
+| <img src="docs/images/control.png" alt="服务控制" width="200"> | <img src="docs/images/deploy.png" alt="部署向导" width="200"> | <img src="docs/images/deploy-progress.png" alt="部署进度" width="200"> |
+
+| 内置浏览器 Built-in browser | 存储管理 Storage manager | 浏览器选择器 Browser picker |
+|---|---|---|
+| <img src="docs/images/webview.png" alt="内置浏览器" width="200"> | <img src="docs/images/storage.png" alt="存储管理" width="200"> | <img src="docs/images/browser-chooser.png" alt="浏览器选择器" width="200"> |
 
 ---
 
